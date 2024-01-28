@@ -1,17 +1,16 @@
 import './Game.css';
 import Board from '../Board/Board';
-import { calculateWinner } from '../../utils/Winner'
-import { useReduxState, useDispatch, ReduxRenderer } from '../../reduxManager';
+import { calculateWinner } from '../../utils/Winner';
+import { useSelector, useDispatch } from 'react-redux';
 import { updateBoard, restartGame } from '../../actions';
-import store from '../../store'; 
 
 const Game = () => {
-  const state = useReduxState();
+  const { board, xIsNext } = useSelector((state) => state);
   const dispatch = useDispatch();
-  const winner = calculateWinner(state.board);
-
+  const winner = calculateWinner(board);
+  
   const handleClick = (index) => {
-    if (winner || state.board[index]) return;
+    if (winner || board[index]) return;
 
     dispatch(updateBoard(index));
   };
@@ -19,29 +18,25 @@ const Game = () => {
   const getStatus = () => {
     if (winner) {
       return `Победитель: ${winner}`;
-    } else if (state.board.every((square) => square !== null)) {
+    } else if (board.every((square) => square !== null)) {
       return 'Ничья!';
     } else {
-      return `Ходит: ${state.xIsNext ? 'X' : 'O'}`;
+      return `Ходит: ${xIsNext ? 'X' : 'O'}`;
     }
   };
 
   const restart = () => {
-    return (
-      <button className='restart' onClick={() => dispatch(restartGame())}>
-        Начать заново
-      </button>
-    );
+    dispatch(restartGame());
   };
 
   return (
-    <ReduxRenderer store={store}>
       <div className='conteiner'>
         <div className='status'>{getStatus()}</div>
-        <Board squares={state.board} click={handleClick} />
-        {restart()}
+        <Board squares={board} click={handleClick} />
+      <button className='restart' onClick={restart}>
+          Начать заново
+        </button>
       </div>
-    </ReduxRenderer>
   );
 };
 
