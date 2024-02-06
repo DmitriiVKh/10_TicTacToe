@@ -1,17 +1,24 @@
-import './Board.css';
+// import './Board.css';
 import Square from '../Square/Square';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { updateBoard } from '../../actions';
+import { Component } from 'react';
 
-const Board = ({squares, click}) => {
-    
+
+class Board extends Component {
+    render() {
+        const { squares, click} = this.props;
+     
     return (
-        <div className='board'>
+        <div className="grid grid-cols-3 w-300 h-300 bg-darkorange">
             {squares.map((square, i) => (
                 <Square key={i} value={square} onClick={() => click(i)}/>
             ))
         }
         </div>
     );
+  }
 }
 
 Board.propTypes = {
@@ -19,4 +26,12 @@ Board.propTypes = {
     click: PropTypes.func.isRequired,
   };
 
-export default Board;
+  const mapStateToProps = (state) => ({
+    squares: state.board,
+  });
+  
+  const mapDispatchToProps = (dispatch) => ({
+    click: (index) => dispatch(updateBoard(index)),
+  });
+  
+  export default connect(mapStateToProps, mapDispatchToProps)(Board);

@@ -1,21 +1,21 @@
-import './Game.css';
+// import './Game.css';
+import { Component } from 'react';
 import Board from '../Board/Board';
 import { calculateWinner } from '../../utils/Winner';
-import { useSelector, useDispatch } from 'react-redux';
+import { connect } from 'react-redux';
 import { updateBoard, restartGame } from '../../actions';
+import PropTypes from 'prop-types';
 
-const Game = () => {
-  const { board, xIsNext } = useSelector((state) => state);
-  const dispatch = useDispatch();
-  const winner = calculateWinner(board);
-  
-  const handleClick = (index) => {
+class Game extends Component {
+  handleClick = (index) => {
+    const { winner, board, updateBoard } = this.props;
     if (winner || board[index]) return;
 
-    dispatch(updateBoard(index));
+    updateBoard(index);
   };
 
-  const getStatus = () => {
+  getStatus = () => {
+    const { winner, board, xIsNext } = this.props;
     if (winner) {
       return `Победитель: ${winner}`;
     } else if (board.every((square) => square !== null)) {
@@ -25,19 +25,41 @@ const Game = () => {
     }
   };
 
-  const restart = () => {
-    dispatch(restartGame());
+  restart = () => {
+    const { restartGame } = this.props;
+    restartGame();
   };
 
-  return (
-      <div className='conteiner'>
-        <div className='status'>{getStatus()}</div>
-        <Board squares={board} click={handleClick} />
-      <button className='restart' onClick={restart}>
+  render() {
+    return (
+      <div className="min-h-screen w-full bg-gray flex justify-center items-center flex-col">
+        <div className="status">{this.getStatus()}</div>
+        <Board />
+        <button className="w-200 h-35 mb-25 cursor-pointer text-black bg-ivory border border-black rounded-md" onClick={this.restart}>
           Начать заново
         </button>
       </div>
-  );
+    );
+  }
+}
+
+Game.propTypes = {
+  board: PropTypes.array.isRequired,
+  winner: PropTypes.string,
+  xIsNext: PropTypes.bool,
+  updateBoard: PropTypes.func.isRequired,
+  restartGame: PropTypes.func.isRequired,
 };
 
-export default Game;
+const mapStateToProps = (state) => ({
+  board: state.board,
+  xIsNext: state.xIsNext,
+  winner: calculateWinner(state.board),
+});
+
+const mapDispatchToProps = (dispatch) => ({
+  updateBoard: (index) => dispatch(updateBoard(index)),
+  restartGame: () => dispatch(restartGame()),
+});
+
+export default connect(mapStateToProps, mapDispatchToProps)(Game);

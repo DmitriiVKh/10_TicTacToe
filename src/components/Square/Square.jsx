@@ -1,17 +1,26 @@
 import './Square.css';
+import { Component } from 'react';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 
-const Square = (props) => {
+class Square extends Component {
+  render() {
+    const { value, onClick } = this.props;
+
     return (
-        <button className='square' onClick={props.onClick}>
-            {props.value !== null ? props.value : ''}
-        </button>
+        <button
+        className=" w-16 h-16 bg-darkorange border border-black cursor-pointer outline-none text-4xl square"
+        onClick={onClick}
+      >
+        {value !== null ? value : ''}
+      </button>
     );
+  }
 }
 
 Square.propTypes = {
-    value: PropTypes.string, 
-    onClick: PropTypes.func.isRequired
+  value: PropTypes.string,
+  onClick: PropTypes.func.isRequired,
 };
 
-export default Square;
+export default connect()(Square);
